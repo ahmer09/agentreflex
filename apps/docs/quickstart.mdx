@@ -1,0 +1,53 @@
+---
+title: Quickstart
+description: Wire your agents, add a reflex, and watch it fire — in a few minutes.
+---
+
+## 1. Initialize
+
+```bash
+npx agentreflex init
+```
+
+`init` detects your agents (Claude Code, Cursor, Gemini CLI, Copilot CLI, Windsurf, OpenCode), asks which to wire, writes each one's native hook, and scaffolds `.reflex/` with a starter reflex.
+
+## 2. Add a reflex
+
+Pull one from the commons:
+
+```bash
+npx agentreflex add no-secrets
+```
+
+Or write your own. Every reflex is a file in `.reflex/`, listed in `.reflex/config.json`:
+
+```js .reflex/no-force-push.mjs
+export default {
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool === "Bash" && /git\s+push\b.*--force\b/.test(ctx.command ?? ""))
+      return { action: "deny", reason: "no force-push — open a PR instead" };
+    return { action: "pass" };
+  },
+};
+```
+
+Edit the file and it takes effect on the next tool call — no rebuild, no restart.
+
+## 3. Check it
+
+```bash
+arx dev "git push --force origin main"   # test a command against your reflexes
+arx doctor                                # see which agents are enforcing
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Writing a reflex" href="/guides/writing-a-reflex">
+    The reflex API, in depth.
+  </Card>
+  <Card title="CLI reference" href="/reference/cli">
+    Every command.
+  </Card>
+</CardGroup>

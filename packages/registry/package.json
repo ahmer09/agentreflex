@@ -1,0 +1,12 @@
+{
+  "name": "@agentreflex/registry",
+  "version": "0.0.0",
+  "description": "Builds the public reflex catalog (registry.json) from /reflexes.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

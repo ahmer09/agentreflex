@@ -1,0 +1,22 @@
+{
+  "name": "@agentreflex/abide",
+  "version": "0.0.0",
+  "description": "Declare your human↔agent working agreement once; deny/ask enforced on every agent.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": { ".": { "import": "./dist/index.js" } },
+  "private": true,
+  "files": ["dist", "reflex.json"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@agentreflex/core": "workspace:*",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0"
+  }
+}

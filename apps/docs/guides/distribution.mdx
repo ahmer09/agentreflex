@@ -1,0 +1,48 @@
+---
+title: Distribution
+description: Share a reflex as a local file, by URL or GitHub, or through the commons — all installed with arx add.
+---
+
+A reflex is a single file, so sharing it is easy. `arx add` resolves four kinds of source and writes the result into `.reflex/`.
+
+## The commons (by name)
+
+Official reflexes are installable by short name from the commons:
+
+```bash
+arx add no-force-push
+```
+
+`add` resolves the name against the catalog at `agentreflex.dev/registry`, downloads the bundle, and wires it in.
+
+## GitHub or a URL
+
+Point `add` at a file in a repo or any URL — great for sharing your own before (or instead of) the commons:
+
+```bash
+arx add github:you/reflexes/no-secrets.mjs
+arx add https://example.com/reflexes/no-secrets.mjs
+```
+
+`github:owner/repo/path` fetches that file from the repo's default branch.
+
+## A local file
+
+Reference a file you already have, or one elsewhere on disk:
+
+```bash
+arx add ./no-force-push.mjs        # already in .reflex/
+arx add ../shared/no-secrets.mjs   # copied in from elsewhere
+```
+
+## How it lands
+
+Every `add` writes the reflex into `.reflex/` and records it in `.reflex/config.json`. It's a plain file in your repo from then on — read it, commit it, and your whole team gets it on clone (`arx install` re-wires the agent hooks).
+
+<Note>
+A reflex is code that runs with your permissions. Pull official reflexes by name, or read what you add from a URL first — see the [trust model](/concepts/trust-model).
+</Note>
+
+## Publishing to the commons
+
+To make a reflex installable by short name, contribute it to the official catalog — see [Contributing](/contributing).

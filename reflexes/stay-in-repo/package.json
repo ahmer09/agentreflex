@@ -1,0 +1,21 @@
+{
+  "name": "@agentreflex/stay-in-repo",
+  "version": "0.0.0",
+  "description": "Blocks edits to files outside the project root.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": { ".": { "import": "./dist/index.js" } },
+  "private": true,
+  "files": ["dist", "reflex.json"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@agentreflex/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0"
+  }
+}

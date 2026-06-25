@@ -1,0 +1,11 @@
+{
+  "name": "@agentreflex/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "agentreflex documentation (Mintlify)",
+  "scripts": {
+    "dev": "mint dev --port 3333",
+    "test": "mint broken-links",
+    "broken-links": "mint broken-links"
+  }
+}

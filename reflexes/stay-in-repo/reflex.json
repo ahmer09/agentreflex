@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "stay-in-repo",
+  "title": "Stay in the repo",
+  "description": "Blocks edits to files outside the project root.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["paths"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["safety", "files", "protective"]
+}

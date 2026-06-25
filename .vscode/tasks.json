@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "install deps",
+      "type": "shell",
+      "command": "pnpm install",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "www: dev",
+      "detail": "Run the marketing site (agentreflex.dev) on http://localhost:3000",
+      "type": "shell",
+      "command": "pnpm --filter @agentreflex/www dev",
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "docs: dev",
+      "detail": "Run the Mintlify docs (docs.agentreflex.dev) on http://localhost:3333",
+      "type": "shell",
+      "command": "npx mint dev --port 3333",
+      "options": { "cwd": "${workspaceFolder}/apps/docs" },
+      "isBackground": true,
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "docs: test (broken links)",
+      "detail": "Validate the docs — fails on broken internal links",
+      "type": "shell",
+      "command": "npx mint broken-links",
+      "options": { "cwd": "${workspaceFolder}/apps/docs" },
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev: site + docs",
+      "detail": "Start the www site and the docs together",
+      "dependsOn": ["www: dev", "docs: dev"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "build: packages",
+      "type": "shell",
+      "command": "pnpm -r --filter \"./packages/*\" --filter \"./reflexes/*\" build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "check: lint + types",
+      "type": "shell",
+      "command": "pnpm biome check . && pnpm -r typecheck",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    }
+  ]
+}

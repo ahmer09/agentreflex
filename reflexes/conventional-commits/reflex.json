@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "conventional-commits",
+  "title": "Conventional commits",
+  "description": "Enforces the Conventional Commits format on git commit -m messages.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["command"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["git", "commits", "proactive"]
+}

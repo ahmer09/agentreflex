@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "no-curl-bash",
+  "title": "No curl | bash",
+  "description": "Blocks piping a remote script straight into a shell (curl … | bash).",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["command"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["security", "supply-chain", "protective"]
+}

@@ -1,0 +1,33 @@
+---
+title: Capability Matrix
+description: Which agents enforce reflexes natively, which decisions each honors, and how agentreflex degrades elsewhere.
+---
+
+The same reflex is meant to run everywhere. But agents differ in what they expose, so coverage falls into two tiers.
+
+## Tiers
+
+- **Native** — the agent exposes a pre-tool hook, so a reflex can `deny` (and sometimes `ask`) before a tool runs.
+- **Advisory** — no hook. agentreflex compiles your reflexes into `AGENTS.md`, so the model is steered but nothing is hard-blocked.
+
+## Support today
+
+| Agent | Tier | `pass` | `deny` | `ask` |
+| --- | --- | --- | --- | --- |
+| Claude Code | Native | ✅ | ✅ | ✅ |
+| Cursor | Native | ✅ | ✅ | ✅ |
+| Copilot CLI | Native | ✅ | ✅ | ✅ |
+| Gemini CLI | Native | ✅ | ✅ | — |
+| Windsurf | Native | ✅ | ✅ | — |
+| OpenCode | Native | ✅ | ✅ | — |
+| Codex | Advisory | ✅ | guidance | guidance |
+
+Where `ask` is unsupported (—), the call is allowed through rather than blocked. `modify` is reserved in the protocol but no agent honors it yet.
+
+## Degradation
+
+A reflex you write once is portable. On native agents `deny` enforces deterministically; on advisory targets it becomes strongly-worded guidance in `AGENTS.md`. You always know which tier you're in:
+
+```bash
+arx doctor
+```

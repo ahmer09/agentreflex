@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "no-force-push",
+  "title": "No force-push",
+  "description": "Blocks git push --force on shared branches. --force-with-lease is still allowed.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["command"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["git", "safety", "protective"]
+}

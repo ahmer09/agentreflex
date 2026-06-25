@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "prefer-rg",
+  "title": "Prefer ripgrep",
+  "description": "Steers recursive grep to ripgrep (rg) — faster, and it respects .gitignore.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["command"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["style", "search", "proactive"]
+}

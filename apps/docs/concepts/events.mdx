@@ -1,0 +1,40 @@
+---
+title: Events
+description: The two lifecycle events a reflex can handle — onToolCall and onToolResult.
+---
+
+A reflex reacts to **events** from the agent. Each one arrives as a normalized context — the same shape across every agent, so a reflex you write once reads the same everywhere.
+
+## `onToolCall`
+
+Fires *before* a tool runs. This is where a reflex decides: inspect the call, return `pass`, `deny`, or `ask`.
+
+```js
+onToolCall(ctx) {
+  // ctx.tool, ctx.command, ctx.paths, ctx.cwd, ctx.agent
+  return { action: "pass" };
+}
+```
+
+## `onToolResult`
+
+Fires *after* a tool runs. It can't block — use it for side effects like snapshots or audit logs.
+
+```js
+onToolResult(ctx) {
+  // ctx.tool, ctx.command, ctx.paths, ctx.cwd
+}
+```
+
+## The context
+
+| Field | Description |
+| --- | --- |
+| `agent` | Which agent is acting (`claude`, `cursor`, `gemini`, …). |
+| `tool` | Normalized tool name (`Bash`, `Edit`, `Write`, `Read`, …). |
+| `command` | The shell command, when the tool is a shell. |
+| `paths` | File paths the tool would touch. |
+| `cwd` | The project working directory. |
+| `raw` | The original agent payload, untouched. |
+
+See the [spec](/reference/spec) for the full types.

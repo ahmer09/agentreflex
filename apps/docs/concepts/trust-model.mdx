@@ -1,0 +1,33 @@
+---
+title: Trust Model
+description: A reflex is code you run — agentreflex keeps it legible and fails open, never closed.
+---
+
+A reflex is code that runs in your environment, with your permissions. Treat one like any dependency you add. agentreflex is built so that's an easy call.
+
+## Reflexes are legible
+
+`arx add` writes the reflex as a plain file into `.reflex/` in your repo — nothing hidden, nothing global. Read it, diff it, and commit it like any other source. The whole reflex is right there.
+
+```bash
+arx add no-force-push   # → writes .reflex/no-force-push.mjs
+```
+
+Official reflexes (installable by short name) are reviewed by maintainers before they land in the commons. Community reflexes you pull from a URL or GitHub are yours to read first.
+
+## Declared capabilities
+
+A distributable reflex ships a `reflex.json` that declares what it does — which decisions it returns, what it reads:
+
+```json
+{
+  "name": "no-secrets",
+  "capabilities": { "decisions": ["deny"], "reads": ["command", "paths"] }
+}
+```
+
+This is a label for transparency, shown in the catalog — not a runtime sandbox. The reflex still runs as ordinary code, so the rule above stands: read what you add.
+
+## Fail-open
+
+If a reflex throws, hangs, or returns nonsense, the dispatcher swallows it and the action proceeds. A safety net should never become an outage — a broken reflex degrades to a no-op rather than wedging your agent.

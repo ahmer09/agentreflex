@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "no-secrets",
+  "title": "No secrets",
+  "description": "Blocks reading or writing .env, private keys, and credential files.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny"],
+    "reads": ["command", "paths"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["security", "secrets", "protective"]
+}

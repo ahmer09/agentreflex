@@ -1,0 +1,85 @@
+---
+title: CLI Reference
+description: Every agentreflex command — init, add, new, install, uninstall, doctor, and dev.
+---
+
+The CLI is `agentreflex`, aliased to `arx`. Both names work.
+
+```bash
+agentreflex <command> [options]
+arx <command> [options]
+```
+
+## `init`
+
+Scaffold `.reflex/`, detect installed agents, wire each one's native hook, and optionally drop in a starter reflex. Interactive.
+
+```bash
+npx agentreflex init
+```
+
+## `add`
+
+Add a reflex from the commons (by name), a GitHub path, a URL, or a local file. Writes it into `.reflex/` and records it in `config.json`.
+
+```bash
+arx add no-force-push
+arx add github:you/reflexes/no-secrets.mjs
+arx add https://example.com/no-secrets.mjs
+arx add ./no-force-push.mjs
+```
+
+## `new`
+
+Scaffold a new reflex file in `.reflex/` and register it.
+
+```bash
+arx new my-reflex
+```
+
+## `install`
+
+Wire (or re-wire) the dispatcher into your agents — run it after cloning a repo that already has reflexes.
+
+```bash
+arx install                 # all detected agents
+arx install --agent claude  # just one
+```
+
+## `uninstall`
+
+Remove agentreflex's hooks from your agents. Your reflex files stay.
+
+```bash
+arx uninstall
+```
+
+## `doctor`
+
+Show which agents are wired and what each can enforce.
+
+```bash
+arx doctor
+```
+
+## `dev`
+
+Run your reflexes against a command and print the verdict — no agent needed.
+
+```bash
+arx dev "git push --force origin main"
+```
+
+## Flags
+
+| Flag | Applies to | Meaning |
+| --- | --- | --- |
+| `--dir <path>` | all | Run as if in another directory. |
+| `--agent <name>` | install, uninstall | Target specific agents (comma-separated). |
+| `--scope <project\|global>` | install, uninstall | Wire the project or your whole machine. |
+| `--global` | install, uninstall | Shorthand for `--scope global`. |
+| `--registry <url>` | add | Resolve names against a different catalog. |
+
+<Note>
+`arx hook --agent <name>` also exists, but it's the machine-facing dispatcher each agent calls — you won't run it by hand.
+</Note>

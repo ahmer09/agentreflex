@@ -1,0 +1,75 @@
+---
+title: Specification
+description: The reflex module interface, the context and decision types, and the reflex.json manifest.
+---
+
+A reflex is defined by a small TypeScript contract from `@agentreflex/core`. Everything else — the per-agent hooks, the catalog — is built around it.
+
+## The reflex module
+
+A reflex's default export implements `Reflex`:
+
+```ts
+interface Reflex {
+  name: string;
+  onToolCall?(ctx: ToolCallContext): Decision | Promise<Decision>;
+  onToolResult?(ctx: ToolResultContext): void | Promise<void>;
+}
+```
+
+## Context
+
+`onToolCall` receives the call *before* it runs; `onToolResult` receives it after.
+
+```ts
+interface ToolCallContext {
+  event: "onToolCall";
+  agent: "claude" | "cursor" | "gemini" | "copilot" | "windsurf" | "opencode" | "codex";
+  tool: string;        // normalized: "Bash" | "Edit" | "Write" | "Read" | …
+  command?: string;    // present when the tool is a shell
+  paths: string[];     // files the tool would touch
+  cwd: string;
+  raw: unknown;        // the original agent payload, untouched
+}
+```
+
+`ToolResultContext` has the same shape with `event: "onToolResult"`.
+
+## Decision
+
+`onToolCall` returns one of:
+
+```ts
+type Decision =
+  | { action: "pass" }
+  | { action: "deny"; reason: string }
+  | { action: "ask"; reason: string }
+  | { action: "modify"; args: Record<string, unknown>; reason?: string };
+```
+
+Helpers build them: `pass()`, `deny(reason)`, `ask(reason)`, `modify(args, reason?)`. Reflexes evaluate in order; the first non-`pass` wins.
+
+## The `reflex.json` manifest
+
+A distributable reflex ships a manifest describing itself for the catalog:
+
+```json
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "no-force-push",
+  "title": "No force-push",
+  "description": "Blocks git push --force on shared branches.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": { "decisions": ["deny"], "reads": ["command"] },
+  "entry": "dist/index.js",
+  "tags": ["git", "safety", "protective"]
+}
+```
+
+## The agent hook
+
+Each wired agent calls `arx hook --agent <name>` before a tool runs. The dispatcher reads the agent's native payload on stdin, normalizes it to a `ToolCallContext`, runs your reflexes, and writes the decision back in that agent's native response format — exit code, stderr, or JSON, depending on the agent. Per-agent translation lives in the adapters, so a reflex never has to know which agent it's running under.

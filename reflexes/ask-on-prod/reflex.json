@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "ask-on-prod",
+  "title": "Ask before prod",
+  "description": "Pauses for confirmation before commands that deploy or publish to production.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["ask"],
+    "reads": ["command"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["deploy", "safety", "protective"]
+}

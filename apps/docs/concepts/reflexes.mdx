@@ -1,0 +1,57 @@
+---
+title: Reflexes
+description: A reflex is a module that reacts to what an agent is about to do and returns a decision.
+---
+
+A reflex is the unit you write, install, and share. It's a module whose default export has a `name` and one or more lifecycle handlers.
+
+```js .reflex/no-force-push.mjs
+export default {
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool === "Bash" && /git\s+push\b.*--force\b/.test(ctx.command ?? ""))
+      return { action: "deny", reason: "no force-push — open a PR instead" };
+    return { action: "pass" };
+  },
+};
+```
+
+## Where reflexes live
+
+Reflexes sit in `.reflex/` and are listed in `.reflex/config.json`:
+
+```json .reflex/config.json
+{
+  "reflexes": ["./no-force-push.mjs", "./no-secrets.mjs"]
+}
+```
+
+`arx init`, `arx add`, and `arx new` manage this for you. Edit a reflex file and it takes effect on the next tool call — the dispatcher loads them fresh each time.
+
+## Ordering
+
+Reflexes run in listed order. The first non-`pass` decision wins, so a `deny` short-circuits the rest. Stack them, reorder them, drop what you don't need.
+
+## Typed authoring
+
+Plain `.mjs` runs anywhere. For types and autocomplete, author in TypeScript with `defineReflex` from `@agentreflex/core` and compile to `.mjs`:
+
+```ts
+import { defineReflex, deny, pass } from "@agentreflex/core";
+
+export default defineReflex({
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool === "Bash" && ctx.command?.includes("--force"))
+      return deny("no force-push — open a PR instead");
+    return pass();
+  },
+});
+```
+
+## Where they come from
+
+- **Local** — files you write in `.reflex/`.
+- **Shared** — added from the commons, a URL, or a GitHub path with `arx add`.
+
+See [Distribution](/guides/distribution).

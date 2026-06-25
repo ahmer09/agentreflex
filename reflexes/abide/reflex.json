@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "abide",
+  "title": "Working agreement",
+  "description": "Declare your human↔agent rules once in plain language; deny/ask is enforced on every agent.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["deny", "ask"],
+    "reads": ["command", "paths"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["governance", "guardrails", "git", "working-agreement"]
+}

@@ -1,0 +1,33 @@
+---
+title: Decisions
+description: A reflex returns pass, deny, or ask — the verdict agentreflex applies before the tool runs.
+---
+
+`onToolCall` returns a **decision**. Three are honored by agents today; a fourth, `modify`, is reserved in the protocol.
+
+| Decision | Effect |
+| --- | --- |
+| `pass` | Allow it; let the next reflex evaluate. |
+| `deny` | Block it; the reason goes back to the agent. |
+| `ask` | Pause for human confirmation first. |
+| `modify` | Rewrite the tool input *(reserved — no agent honors it yet)*. |
+
+## Examples
+
+```js
+return { action: "deny", reason: "that's a secrets file" };
+return { action: "ask", reason: "this looks like it touches production — confirm?" };
+return { action: "pass" };
+```
+
+Authoring in TypeScript, there are helpers for each:
+
+```ts
+import { deny, ask, pass } from "@agentreflex/core";
+
+return deny("that's a secrets file");
+```
+
+## Not every agent honors every decision
+
+Claude Code, Cursor, and Copilot CLI honor both `deny` and `ask`. Gemini CLI, Windsurf, and OpenCode honor `deny` — an `ask` there isn't enforced and the call is allowed through, so prefer `deny` for rules that must hold everywhere. See the [capability matrix](/concepts/capability-matrix).

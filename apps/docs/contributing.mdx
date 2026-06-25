@@ -1,0 +1,44 @@
+---
+title: Contributing
+description: Contribute an official reflex by PR, or share a community reflex from your own repo.
+---
+
+Two ways to get a reflex in front of other people: contribute it to the *commons* as an official reflex, or share it from your own repo as a *community* reflex.
+
+## Official reflexes
+
+Official reflexes live in [`/reflexes`](https://github.com/agentreflex/agentreflex) and are installable by short name (`arx add <name>`). Each is a small package:
+
+```bash
+reflexes/no-force-push/
+  src/index.ts     # defineReflex({ name, onToolCall })
+  reflex.json      # manifest: title, description, capabilities, tags
+  test/            # at least one test
+  package.json
+  README.md
+```
+
+To contribute one:
+
+1. Fork `agentreflex/agentreflex`.
+2. Add `reflexes/<name>/` with the files above.
+3. Make sure `pnpm test` passes, then open a PR.
+
+Official reflexes are held to a higher bar — single-purpose, accurate `reflex.json` capabilities, and a test that proves both the catch and the non-catch. Maintainers review the source before merge, and the catalog is rebuilt on release.
+
+## Community reflexes
+
+Anything else is welcome from your own repo. Publish the reflex as a single `.mjs` file and share the path — users install it directly:
+
+```bash
+arx add github:you/reflexes/my-reflex.mjs
+```
+
+Add an entry to **awesome-reflexes** so others can find it.
+
+## Guidelines
+
+- Keep reflexes small and single-purpose; compose rather than bundle.
+- Reach for `deny`/`ask` deliberately — prefer the narrowest rule that holds.
+- Be shell-aware: use `parseCommand` so `cd x && …` can't slip past a check.
+- Declare what the reflex does in `reflex.json` — no surprises.

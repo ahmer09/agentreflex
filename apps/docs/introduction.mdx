@@ -1,0 +1,52 @@
+---
+title: Introduction
+description: agentreflex is the open commons of reflexes for AI coding agents — write an instinct once, and it fires in every agent.
+---
+
+AI coding agents edit files, run commands, and call tools on your behalf. **agentreflex** lets you capture the instincts you'd apply by hand — *reflexes* — and have them fire in every agent you use: Claude Code, Cursor, Gemini CLI, Copilot CLI, Windsurf, and OpenCode natively, advisory everywhere else.
+
+## Skills vs. reflexes
+
+| Layer | The question it answers | Where it lives |
+| --- | --- | --- |
+| **Instructions** | What should the agent know and prefer? | `AGENTS.md` |
+| **Skills / tools** | What can the agent reach and do? | MCP, skills |
+| **Reflexes** | What would *you* do the moment it acts? | **agentreflex** |
+
+Instructions are advice a model can ignore. Skills hand it new powers. Neither guarantees anything at the instant an action runs. A reflex does — deterministic code that sees every tool call and decides, before it happens.
+
+## What a reflex is
+
+A small module that reacts to what an agent is about to do:
+
+```js .reflex/no-force-push.mjs
+export default {
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool === "Bash" && /git\s+push\b.*--force\b/.test(ctx.command ?? ""))
+      return { action: "deny", reason: "no force-push — open a PR instead" };
+    return { action: "pass" };
+  },
+};
+```
+
+Write it once. agentreflex compiles it into each agent's native hook, so the same instinct fires everywhere.
+
+## An open commons
+
+A reflex is a file you own — keep it in your repo, hand it to your team, or pull one the community built:
+
+```bash
+npx agentreflex add no-force-push
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" href="/quickstart">
+    From zero to a firing reflex in a few minutes.
+  </Card>
+  <Card title="Reflexes" href="/concepts/reflexes">
+    What a reflex is, and how it runs.
+  </Card>
+</CardGroup>

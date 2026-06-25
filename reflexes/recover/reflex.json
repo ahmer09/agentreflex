@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agentreflex.dev/schema/reflex-v1.json",
+  "name": "recover",
+  "title": "Edit safety net",
+  "description": "Snapshots files before the agent edits them, so any change is undoable.",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "agentreflex",
+  "official": true,
+  "events": ["onToolCall"],
+  "capabilities": {
+    "decisions": ["pass"],
+    "reads": ["paths"]
+  },
+  "entry": "dist/index.js",
+  "tags": ["safety", "undo", "snapshots", "files"]
+}

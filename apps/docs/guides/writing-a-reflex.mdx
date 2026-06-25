@@ -1,0 +1,71 @@
+---
+title: Writing a Reflex
+description: Author a reflex as a plain module, or in TypeScript with defineReflex for types.
+---
+
+## Scaffold
+
+```bash
+arx new no-force-push
+```
+
+This writes `.reflex/no-force-push.mjs` and adds it to `.reflex/config.json`. Edit it and it fires on the next tool call — no rebuild.
+
+## A plain reflex
+
+A reflex is a module with a default export: a `name` and an `onToolCall` handler that returns a decision.
+
+```js .reflex/no-force-push.mjs
+export default {
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool !== "Bash") return { action: "pass" };
+    if (/git\s+push\b.*(--force|-f)\b/.test(ctx.command ?? ""))
+      return { action: "deny", reason: "no force-push — open a PR instead" };
+    return { action: "pass" };
+  },
+};
+```
+
+`ctx` carries `tool`, `command`, `paths`, `cwd`, and `agent`. Return `{ action: "pass" }`, `{ action: "deny", reason }`, or `{ action: "ask", reason }`.
+
+## Typed, with `defineReflex`
+
+For autocomplete and type-checking, author in TypeScript against `@agentreflex/core` and compile to `.mjs`. The helpers (`deny`, `ask`, `pass`) build the decisions for you, and `parseCommand` splits compound commands so `cd x && git push --force` can't slip past a check.
+
+```ts
+import { defineReflex, deny, pass, parseCommand } from "@agentreflex/core";
+
+export default defineReflex({
+  name: "no-force-push",
+  onToolCall(ctx) {
+    if (ctx.tool !== "Bash" || !ctx.command) return pass();
+    for (const c of parseCommand(ctx.command)) {
+      if (c.argv[0] === "git" && c.argv[1] === "push" && c.argv.includes("--force"))
+        return deny("no force-push — open a PR instead");
+    }
+    return pass();
+  },
+});
+```
+
+## Side effects with `onToolResult`
+
+`onToolResult` runs *after* a tool and can't block — use it for snapshots, logging, or post-hoc checks.
+
+```ts
+export default defineReflex({
+  name: "audit-writes",
+  onToolResult(ctx) {
+    if (ctx.tool === "Write") log(ctx.paths);
+  },
+});
+```
+
+## Test it
+
+```bash
+arx dev "git push --force origin main"
+```
+
+`dev` runs your reflexes against a command and prints the verdict, so you can iterate without re-triggering the agent. See the full types in the [spec](/reference/spec).
