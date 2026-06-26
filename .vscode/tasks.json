@@ -19,6 +19,26 @@
       "problemMatcher": []
     },
     {
+      "label": "www: build (static export)",
+      "detail": "Build the marketing site to apps/www/out for Cloudflare Pages",
+      "type": "shell",
+      "command": "pnpm --filter @agentreflex/www build",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
+      "label": "www: preview (static, as deployed)",
+      "detail": "Build, then serve apps/www/out exactly as Cloudflare Pages does — http://localhost:8787",
+      "type": "shell",
+      "command": "npx wrangler pages dev apps/www/out --port 8787",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": ["www: build (static export)"],
+      "isBackground": true,
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
       "label": "docs: dev",
       "detail": "Run the Fumadocs docs (docs.agentreflex.dev) on http://localhost:3333",
       "type": "shell",
@@ -38,8 +58,19 @@
       "problemMatcher": []
     },
     {
+      "label": "docs: preview (static, as deployed)",
+      "detail": "Build, then serve apps/docs/out exactly as Cloudflare Pages does (honors _redirects + static search) — http://localhost:8788",
+      "type": "shell",
+      "command": "npx wrangler pages dev apps/docs/out --port 8788",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": ["docs: build (static export)"],
+      "isBackground": true,
+      "presentation": { "group": "agentreflex", "panel": "dedicated", "reveal": "always" },
+      "problemMatcher": []
+    },
+    {
       "label": "dev: site + docs",
-      "detail": "Start the www site and the docs together",
+      "detail": "Start the www site and the docs together (dev servers)",
       "dependsOn": ["www: dev", "docs: dev"],
       "dependsOrder": "parallel",
       "problemMatcher": [],
