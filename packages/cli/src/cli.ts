@@ -31,6 +31,7 @@ const VALUE_FLAGS = new Set([
   "--event",
   "--reflex",
   "--file",
+  "--with",
 ]);
 
 function parseArgs(rest: string[]): { opts: Opts; pos: string[] } {
@@ -401,6 +402,18 @@ async function cmdDev(opts: Opts, pos: string[], cwd: string): Promise<void> {
       : [];
   const event = opts.event === "onToolResult" ? "onToolResult" : "onToolCall";
 
+  let options: Record<string, unknown> | undefined;
+  if (typeof opts.with === "string" && opts.with) {
+    try {
+      options = JSON.parse(opts.with);
+    } catch {
+      console.log(
+        `  ${dim("--with must be valid JSON, e.g.")} ${lime('--with \'{"allow":["src/**"]}\'')}\n`,
+      );
+      return;
+    }
+  }
+
   const subject = command
     ? `${dim("$")} ${white(command)}`
     : `${white(tool)}${paths.length ? ` ${dim(paths.join(" "))}` : ""}`;
@@ -408,12 +421,21 @@ async function cmdDev(opts: Opts, pos: string[], cwd: string): Promise<void> {
   console.log(`  ${subject}`);
 
   if (event === "onToolResult") {
-    await runToolResult(reflexes, { event, agent, tool, command, paths, cwd, raw: {} });
+    await runToolResult(reflexes, { event, agent, tool, command, paths, cwd, raw: {}, options });
     console.log(`  ${mark} ${dim("onToolResult ran (side effects only — never blocks)")}\n`);
     return;
   }
 
-  const d = await runToolCall(reflexes, { event, agent, tool, command, paths, cwd, raw: {} });
+  const d = await runToolCall(reflexes, {
+    event,
+    agent,
+    tool,
+    command,
+    paths,
+    cwd,
+    raw: {},
+    options,
+  });
   const verdict =
     d.action === "deny"
       ? lime("deny")
@@ -442,7 +464,7 @@ function help(): void {
       row("dev", "simulate a tool call against your reflexes"),
       "",
       `  ${dim("dev")}    ${dim('arx dev "git push --force"')}  ${dim("·")} ${dim("--tool Read --paths .env")}`,
-      `         ${dim("--reflex <name>")} ${dim("·")} ${dim("--file ./r.mjs")} ${dim("·")} ${dim("--agent")} ${dim("·")} ${dim("--event onToolResult")}`,
+      `         ${dim("--reflex <name>")} ${dim("·")} ${dim("--file ./r.mjs")} ${dim("·")} ${dim("--with '{json}'")} ${dim("·")} ${dim("--agent")} ${dim("·")} ${dim("--event onToolResult")}`,
       `  ${dim("flags")}  ${dim("--dir <path>")} ${dim("run in another folder")}  ${dim("·")} ${dim("--scope")}`,
       "",
       `  ${dim("docs")}   ${cyan("https://docs.agentreflex.dev")}`,

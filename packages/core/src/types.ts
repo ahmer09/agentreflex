@@ -26,6 +26,8 @@ export interface ToolCallContext {
   cwd: string;
   /** The original agent payload, untouched. */
   raw: unknown;
+  /** Options this reflex was configured with in `.reflex/config.json` (`with`). */
+  options?: Record<string, unknown>;
 }
 
 /** A normalized tool result, after the agent runs it. */
@@ -37,6 +39,8 @@ export interface ToolResultContext {
   paths: string[];
   cwd: string;
   raw: unknown;
+  /** Options this reflex was configured with in `.reflex/config.json` (`with`). */
+  options?: Record<string, unknown>;
 }
 
 export type ReflexContext = ToolCallContext | ToolResultContext;

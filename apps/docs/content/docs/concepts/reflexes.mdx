@@ -28,6 +28,16 @@ Reflexes sit in `.reflex/` and are listed in `.reflex/config.json`:
 
 `arx init`, `arx add`, and `arx new` manage this for you. Edit a reflex file and it takes effect on the next tool call — the dispatcher loads them fresh each time.
 
+A reflex that takes options is listed as an object with a `with` block, which the reflex reads as `ctx.options`:
+
+```json .reflex/config.json
+{
+  "reflexes": [
+    { "source": "./scope-check.mjs", "with": { "allow": ["src/**"] } }
+  ]
+}
+```
+
 ## Ordering
 
 Reflexes run in listed order. The first non-`pass` decision wins, so a `deny` short-circuits the rest. Stack them, reorder them, drop what you don't need.

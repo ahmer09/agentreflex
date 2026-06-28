@@ -83,6 +83,18 @@
       "uniqueItems": true,
       "items": { "type": "string" },
       "description": "Catalog facets (e.g. security, git, protective, proactive)."
+    },
+    "options": {
+      "type": "object",
+      "description": "Config this reflex accepts via `.reflex/config.json` `with`, surfaced as `ctx.options`. Each key documents one option.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "required": { "type": "boolean" }
+        }
+      }
     }
   }
 }

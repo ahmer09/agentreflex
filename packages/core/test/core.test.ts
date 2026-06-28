@@ -68,6 +68,31 @@ describe("runToolCall", () => {
   });
 });
 
+describe("configurable reflex (ctx.options)", () => {
+  // A reflex whose behavior is driven by config passed via `.reflex/config.json` `with`.
+  const gate: Reflex = {
+    name: "gate",
+    onToolCall: (c) => {
+      const blocked = (c.options?.blocked as string[]) ?? [];
+      return blocked.some((b) => (c.command ?? "").includes(b))
+        ? deny("blocked by config")
+        : pass();
+    },
+  };
+
+  it("reads options threaded through ctx", async () => {
+    const withOpts = { ...ctx("git push"), options: { blocked: ["git push"] } };
+    expect(await runToolCall([gate], withOpts)).toEqual({
+      action: "deny",
+      reason: "blocked by config",
+    });
+  });
+
+  it("passes when no options are set", async () => {
+    expect(await runToolCall([gate], ctx("git push"))).toEqual({ action: "pass" });
+  });
+});
+
 describe("decision helpers", () => {
   it("build the canonical shapes", () => {
     expect(deny("r")).toEqual({ action: "deny", reason: "r" });

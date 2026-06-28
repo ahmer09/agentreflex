@@ -49,6 +49,37 @@ export default defineReflex({
 });
 ```
 
+## Configurable reflexes
+
+A reflex can accept options so the same logic works with different settings. Whoever installs it sets them under `with` in `.reflex/config.json`, and the reflex reads them from `ctx.options`:
+
+```json title=".reflex/config.json"
+{
+  "reflexes": [
+    { "source": "./scope-check.mjs", "with": { "allow": ["src/**"] } }
+  ]
+}
+```
+
+```ts
+export default defineReflex({
+  name: "scope-check",
+  onToolCall(ctx) {
+    const allow = (ctx.options?.allow as string[]) ?? [];
+    // ...use allow
+    return pass();
+  },
+});
+```
+
+Declare the options your reflex accepts in `reflex.json` under `options`, so they're documented and validated. Test a configured reflex with `arx dev --with`:
+
+```bash
+arx dev --reflex scope-check --tool Edit --paths src/app.ts --with '{"allow":["src/**"]}'
+```
+
+> Options go under the entry's `with` block. A top-level key in `config.json` is not read.
+
 ## Side effects with `onToolResult`
 
 `onToolResult` runs *after* a tool and can't block — use it for snapshots, logging, or post-hoc checks.

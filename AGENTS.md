@@ -61,15 +61,43 @@ export default defineReflex({
 });
 ```
 
+## Configurable reflexes (options)
+
+A reflex can take options. The `.reflex/config.json` entry becomes an object with a
+`with` block, and the reflex reads it as `ctx.options`:
+
+```json
+{
+  "reflexes": [
+    { "source": "./scope-check.mjs", "with": { "allow": ["src/**"], "objective": "..." } }
+  ]
+}
+```
+
+```ts
+onToolCall(ctx) {
+  const allow = (ctx.options?.allow as string[]) ?? [];
+  // ...
+}
+```
+
+Declare accepted options in `reflex.json` under `options`. Test a configured reflex
+without touching `config.json`:
+
+```bash
+pnpm reflex:dev scope-check --tool Edit --paths src/x.ts --with '{"allow":["src/**"]}'
+```
+
+**Note:** options go under `with`. A *top-level* key like `{ "my-reflex": { ... } }`
+in `config.json` is NOT read.
+
 ## Don't do these (real mistakes we've seen)
 
-- **Don't invent config keys in `.reflex/config.json`.** Reflexes do **not** take
-  per-reflex options today — `config.json` is just `{ "reflexes": ["./x.mjs"] }`. A
-  block like `{ "my-reflex": { "allow": [...] } }` is silently ignored. If a reflex
-  needs to be configurable, raise it in an issue — it's a known gap, not a feature yet.
-- **Don't add a reflex by editing a contributor's live `.reflex/` to "see if it fires."**
-  Use `reflex:dev` / `reflex:check`.
+- **Don't test by wiring a reflex into a live agent and restarting** to "see if it
+  fires." Use `reflex:dev` / `reflex:check`.
 - **Don't hand-write agent hook payloads** to test. Use `reflex:dev`.
+- **Don't put reflex options as top-level keys** in `config.json` — use the `with`
+  block on the entry (see above).
 
 ## Layout
 

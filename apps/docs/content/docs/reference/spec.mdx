@@ -30,6 +30,7 @@ interface ToolCallContext {
   paths: string[];     // files the tool would touch
   cwd: string;
   raw: unknown;        // the original agent payload, untouched
+  options?: Record<string, unknown>; // config passed to this reflex (see below)
 }
 ```
 
@@ -69,6 +70,30 @@ A distributable reflex ships a manifest describing itself for the catalog:
   "tags": ["git", "safety", "protective"]
 }
 ```
+
+A reflex that takes configuration declares it under an optional `options` key in the manifest, so it's documented and editor-validated.
+
+## Configuration
+
+A reflex can be configured by whoever installs it. The `.reflex/config.json` entry becomes an object with a `with` block, and the reflex reads it from `ctx.options`:
+
+```json title=".reflex/config.json"
+{
+  "reflexes": [
+    "./no-secrets.mjs",
+    { "source": "./scope-check.mjs", "with": { "allow": ["src/**"] } }
+  ]
+}
+```
+
+```ts
+onToolCall(ctx) {
+  const allow = (ctx.options?.allow as string[]) ?? [];
+  // …
+}
+```
+
+A plain string entry (`"./x.mjs"`) is shorthand for `{ "source": "./x.mjs" }` with no options. Options live under `with`; a top-level key in `config.json` is not read.
 
 ## The agent hook
 
