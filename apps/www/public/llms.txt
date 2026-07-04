@@ -40,6 +40,7 @@
 ## Links
 
 - Home: https://agentreflex.dev
+- Why reflexes (essay): https://agentreflex.dev/blog/reflexes
 - Docs: https://docs.agentreflex.dev
 - Source & official reflexes: https://github.com/agentreflex/agentreflex
 - Community catalog: https://github.com/agentreflex/awesome-reflexes
