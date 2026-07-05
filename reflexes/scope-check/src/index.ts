@@ -1,5 +1,5 @@
-import { defineReflex, pass, type Decision, type ToolCallContext } from "@agentreflex/core";
 import path from "node:path";
+import { type Decision, type ToolCallContext, defineReflex, pass } from "@agentreflex/core";
 
 const WRITE_TOOLS = new Set(["Write", "Edit", "MultiEdit"]);
 
@@ -13,9 +13,9 @@ function matchesGlob(filePath: string, pattern: string, cwd: string): boolean {
   const escaped = pattern
     .replace(/\\/g, "/")
     .replace(/[.+^${}()|[\]]/g, "\\$&")
-    .replace(/\*\*/g, "\x00")
+    .replace(/\*\*/g, "DOUBLE_STAR")
     .replace(/\*/g, "[^/]*")
-    .replace(/\x00/g, ".*");
+    .replace(/DOUBLE_STAR/g, ".*");
   return new RegExp(`^${escaped}$`).test(rel);
 }
 
@@ -46,7 +46,8 @@ export default defineReflex({
     if (allow.length === 0) {
       return {
         action: "deny",
-        reason: `scope-check: allow list is empty — all writes are blocked. Add patterns to the \`allow\` list in .reflex/config.json to permit writes.`,
+        reason:
+          "scope-check: allow list is empty — all writes are blocked. Add patterns to the `allow` list in .reflex/config.json to permit writes.",
       };
     }
 
