@@ -190,17 +190,16 @@ export default {
       <P>
         MIT, v0.x. Six enforcing adapters, verified against live agents, and about ten official
         reflexes to start: protective ones (no-secrets, no-rm-rf, ask-on-prod, stay-in-repo,
-        no-curl-bash) and proactive ones (recover, which snapshots files before the agent edits
-        them so any change is undoable; prefer-rg; conventional-commits), plus <C>abide</C>,
-        where you write your human↔agent working agreement in plain language and it&rsquo;s
-        enforced everywhere.
+        no-curl-bash) and proactive ones (recover, which snapshots files before the agent edits them
+        so any change is undoable; prefer-rg; conventional-commits), plus <C>abide</C>, where you
+        write your human↔agent working agreement in plain language and it&rsquo;s enforced
+        everywhere.
       </P>
       <P>
-        Harness APIs churn; keeping the adapters current is the job — and the moat. The longer
-        arc is a language-neutral spec, so any harness can implement reflex support and any
-        language can author one, and a registry so the useful reflexes find the next person who
-        needs them. A library earns stars. A shared layer everyone can build on is the thing
-        worth trying for.
+        Harness APIs churn; keeping the adapters current is the job — and the moat. The longer arc
+        is a language-neutral spec, so any harness can implement reflex support and any language can
+        author one, and a registry so the useful reflexes find the next person who needs them. A
+        library earns stars. A shared layer everyone can build on is the thing worth trying for.
       </P>
       <P>If you use more than one coding agent, try it on a repo:</P>
       <Code>{`npx agentreflex init
