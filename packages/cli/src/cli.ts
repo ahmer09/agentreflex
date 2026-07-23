@@ -127,7 +127,7 @@ async function cmdHook(agent: string): Promise<void> {
     } else {
       const reaction = await runToolResult(reflexes, ctx);
       // An adapter without formatResult can't carry reactions — degrade to a no-op.
-      const res = adapter.formatResult?.(reaction) ?? {};
+      const res = adapter.formatResult?.(reaction, ctx) ?? {};
       if (res.stdout) process.stdout.write(res.stdout);
       if (res.stderr) process.stderr.write(res.stderr);
       if (res.exit && res.exit !== 0) process.exit(res.exit);

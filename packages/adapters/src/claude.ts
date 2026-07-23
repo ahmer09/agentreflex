@@ -10,28 +10,37 @@ import type {
   ReflexContext,
   ResolvedMcpServer,
   Scope,
+  ToolResultContext,
 } from "@agentreflex/core";
 
 const HOOK = "arx hook --agent claude";
 const MATCHER = "Bash|Edit|MultiEdit|Write";
 
+type HookMatcherEntry = { matcher?: string; hooks: Array<{ type: string; command: string }> };
+
 interface Settings {
   hooks?: {
-    PreToolUse?: Array<{ matcher?: string; hooks: Array<{ type: string; command: string }> }>;
-    PostToolUse?: Array<{ matcher?: string; hooks: Array<{ type: string; command: string }> }>;
+    PreToolUse?: HookMatcherEntry[];
+    PostToolUse?: HookMatcherEntry[];
+    PostToolUseFailure?: HookMatcherEntry[];
     [k: string]: unknown;
   };
   [k: string]: unknown;
 }
 
-/** The two tool-hook events the adapter wires: PreToolUse carries decisions,
- *  PostToolUse carries reactions. */
-const HOOK_EVENTS = ["PreToolUse", "PostToolUse"] as const;
+/** The tool-hook events the adapter wires: PreToolUse carries decisions,
+ *  PostToolUse and PostToolUseFailure carry reactions. Failing tool calls fire
+ *  PostToolUseFailure INSTEAD of PostToolUse (Claude Code ≥ 2.1), so a reflex
+ *  watching results — especially failures — needs both. */
+const HOOK_EVENTS = ["PreToolUse", "PostToolUse", "PostToolUseFailure"] as const;
 interface Payload {
   hook_event_name?: string;
   tool_name?: string;
   tool_input?: Record<string, unknown>;
   tool_response?: unknown;
+  /** PostToolUseFailure carries no tool_response — the failure text lives here
+   *  (e.g. "Exit code 1\nconnection refused"). */
+  error?: unknown;
   cwd?: string;
 }
 
@@ -44,6 +53,7 @@ function normalizeResponse(response: unknown): { output?: string; success?: bool
   const parts: string[] = [];
   if (typeof r.stdout === "string" && r.stdout) parts.push(r.stdout);
   if (typeof r.stderr === "string" && r.stderr) parts.push(r.stderr);
+  if (typeof r.error === "string" && r.error) parts.push(r.error);
   const output = parts.length > 0 ? parts.join("\n") : undefined;
   const success = typeof r.success === "boolean" ? r.success : undefined;
   return { output, success };
@@ -225,8 +235,16 @@ export const claude: Adapter = {
       cwd: p.cwd ?? process.cwd(),
       raw: payload,
     };
-    if (p.hook_event_name === "PostToolUse") {
-      return { event: "onToolResult", ...base, ...normalizeResponse(p.tool_response) };
+    if (p.hook_event_name === "PostToolUse" || p.hook_event_name === "PostToolUseFailure") {
+      const normalized = normalizeResponse(p.tool_response);
+      // A failure event is an authoritative "this did not succeed", and its
+      // failure text arrives top-level instead of in tool_response.
+      if (p.hook_event_name === "PostToolUseFailure") {
+        normalized.success = false;
+        if (normalized.output === undefined && typeof p.error === "string" && p.error)
+          normalized.output = p.error;
+      }
+      return { event: "onToolResult", ...base, ...normalized };
     }
     return { event: "onToolCall", ...base };
   },
@@ -244,12 +262,17 @@ export const claude: Adapter = {
     };
   },
 
-  formatResult(reaction: Reaction): HookResponse {
+  formatResult(reaction: Reaction, ctx?: ToolResultContext): HookResponse {
+    // Echo the event we're responding to — a PostToolUseFailure response must
+    // not claim to be PostToolUse.
+    const raw = (ctx?.raw ?? {}) as Payload;
+    const hookEventName =
+      raw.hook_event_name === "PostToolUseFailure" ? "PostToolUseFailure" : "PostToolUse";
     if (reaction.action === "inject") {
       return {
         stdout: JSON.stringify({
           hookSpecificOutput: {
-            hookEventName: "PostToolUse",
+            hookEventName,
             additionalContext: reaction.context,
           },
         }),

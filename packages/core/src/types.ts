@@ -159,8 +159,9 @@ export interface Adapter {
   /** Serialize a decision to the agent's native response (stdout/stderr/exit). */
   format(decision: Decision): HookResponse;
   /** Serialize a reaction to the agent's native post-tool response. Absent =
-   *  the agent can't carry reactions and they degrade to no-ops. */
-  formatResult?(reaction: Reaction): HookResponse;
+   *  the agent can't carry reactions and they degrade to no-ops. The context
+   *  lets dialects that distinguish success/failure events respond in kind. */
+  formatResult?(reaction: Reaction, ctx?: ToolResultContext): HookResponse;
   install(scope: Scope): { file: string; changed: boolean };
   uninstall(scope: Scope): { file: string; changed: boolean };
   isInstalled(scope: Scope): boolean;
